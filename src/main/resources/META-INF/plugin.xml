@@ -1,0 +1,51 @@
+<idea-plugin>
+    <id>com.github.rmatafonov.cucumber-scenarios-indexer</id>
+    <name>Cucumber Scenarios Indexer</name>
+    <vendor email="matafonov.rv@gmail.com" url="https://www.linkedin.com/in/rmatafonov">Roman Matafonov</vendor>
+
+    <description><![CDATA[
+    A little plugin which updates your Cucumber feature files with indexes for scenarios </br>
+    E.g. before: </br>
+    Scenario: testing requirement #345 </br>
+    Scenario Outline: testing requirement #123 </br>
+    </br>
+    after: </br>
+    Scenario: 01 - testing requirement #345 </br>
+    Scenario Outline: 02 - testing requirement #123 </br>
+    </br>
+    OR </br>
+    before: </br>
+    Scenario: 01 - testing requirement #345 </br>
+    Scenario Outline: 02 - testing requirement #123 </br>
+    Scenario: 01 - testing requirement #345 </br>
+    Scenario Outline: 02 - testing requirement #123 </br>
+    </br>
+    after: </br>
+    Scenario: 01 - testing requirement #345 </br>
+    Scenario Outline: 02 - testing requirement #123 </br>
+    Scenario: 03 - testing requirement #345 </br>
+    Scenario Outline: 04 - testing requirement #123 </br>
+    </br>
+    Works from the context menu in a project files tree - will change a *.feature file or all the *.feature files in
+    a directory and all the subdirectories
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <group id="Some.Id" text="Index Cucumber Scenarios" description=":)">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <separator/>
+            <action class="IndexCucumberScenariosAction" id="IndexCucumberScenarios.Files" text="Index Cucumber Scenarios"/>
+            <separator/>
+        </group>
+    </actions>
+</idea-plugin>
