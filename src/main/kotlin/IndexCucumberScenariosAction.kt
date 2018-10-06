@@ -1,39 +1,40 @@
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.ui.Messages
-import java.io.File
-import java.io.PrintWriter
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
+import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.*
+import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiPlainTextFile
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class IndexCucumberScenariosAction : AnAction("Index Cucumber Scenarios") {
     override fun actionPerformed(e: AnActionEvent?) {
-        e?.let {
-            it.getData(PlatformDataKeys.VIRTUAL_FILE)?.let {
-                File(it.canonicalPath).walkTopDown()
-                        .filter { it.name.endsWith(".feature") }
-                        .map {
-                            if (rewriteFeature(it)) "${it.name} is changed" else it.name
-                        }
-                        .joinToString(separator = "\n").also {
-                            Messages.showMessageDialog(e.project, it, "Done", Messages.getInformationIcon())
-                        }
+        e?.let { event ->
+            event.getData(PlatformDataKeys.VIRTUAL_FILE)?.let { virtualFile ->
+                VfsUtilCore.visitChildrenRecursively(virtualFile, MyVirtualFileVisitor(event.project))
             }
         }
     }
 
-    private fun rewriteFeature(file: File): Boolean {
-        val indexingPath = file.toPath()
-        val tmpPath = "$indexingPath.tmp"
-        val indexingWriter = PrintWriter(tmpPath)
-        var i = 1
-        var isChanged = false
+    private class MyVirtualFileVisitor(project: Project?) : VirtualFileVisitor<MyVirtualFileVisitor>() {
+        val project: Project = checkNotNull(project)
 
-        Files.lines(indexingPath).apply {
-            this.forEach {
-                val replacingLine = when {
+        override fun visitFile(file: VirtualFile): Boolean {
+            if (!file.name.endsWith(".feature")) {
+                return true
+            }
+
+            var i = 1
+
+            val document = checkNotNull(FileDocumentManager.getInstance().getDocument(file))
+
+            val updatedContent = document.text.lines().map {
+                return@map when {
                     it.trim().matches(Regex("^Scenario: \\d+.*")) -> {
                         it.replace(Regex("Scenario: \\d+"), String.format("Scenario: %02d", i++))
                     }
@@ -48,23 +49,17 @@ class IndexCucumberScenariosAction : AnAction("Index Cucumber Scenarios") {
                     }
                     else -> it
                 }
-                indexingWriter.println(replacingLine)
-                if (it != replacingLine) {
-                    isChanged = true
-                }
             }
 
-            this.close()
+            CommandProcessor.getInstance().executeCommand(
+                    project,
+                    { document.setText(updatedContent.joinToString("\n")) },
+                    "Index Cucumber Scenarios",
+                    123,
+                    document
+            )
+
+            return true
         }
-
-        indexingWriter.flush()
-        indexingWriter.close()
-
-        Files.deleteIfExists(indexingPath)
-        Files.move(Paths.get(tmpPath), indexingPath, StandardCopyOption.REPLACE_EXISTING)
-
-        return isChanged
     }
-
-
 }
