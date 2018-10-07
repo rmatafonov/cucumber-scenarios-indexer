@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.github.rmatafonov'
-version '1.0.1'
+version '1.0.2'
 
 sourceCompatibility = 1.8
 
@@ -21,19 +21,16 @@ intellij {
     version '2017.1.4'
     pluginName 'index-cucumber-scenarios'
     updateSinceUntilBuild true
-    publish {
-        pluginId 'index-cucumber-scenarios'
-    }
     patchPluginXml {
         sinceBuild 171
         untilBuild ""
     }
+
+    publishPlugin {
+        username intellijPublishUsername
+        password intellijPublishPassword
+    }
 }
 patchPluginXml {
     changeNotes """ """
-}
-
-publishPlugin {
-    username intellijPublishUsername
-    password intellijPublishPassword
 }
