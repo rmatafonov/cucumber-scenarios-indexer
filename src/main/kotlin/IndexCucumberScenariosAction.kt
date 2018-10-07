@@ -1,16 +1,14 @@
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.*
-import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiPlainTextFile
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import com.intellij.openapi.vfs.ReadonlyStatusHandler
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileVisitor
 
 class IndexCucumberScenariosAction : AnAction("Index Cucumber Scenarios") {
     override fun actionPerformed(e: AnActionEvent?) {
@@ -29,9 +27,13 @@ class IndexCucumberScenariosAction : AnAction("Index Cucumber Scenarios") {
                 return true
             }
 
-            var i = 1
+            val document = checkNotNull(FileDocumentManager.getInstance().getDocument(file)) {
+                return true
+            }
 
-            val document = checkNotNull(FileDocumentManager.getInstance().getDocument(file))
+            ReadonlyStatusHandler.ensureDocumentWritable(project, document)
+
+            var i = 1
 
             val updatedContent = document.text.lines().map {
                 return@map when {
@@ -53,9 +55,13 @@ class IndexCucumberScenariosAction : AnAction("Index Cucumber Scenarios") {
 
             CommandProcessor.getInstance().executeCommand(
                     project,
-                    { document.setText(updatedContent.joinToString("\n")) },
+                    {
+                        ApplicationManager.getApplication().runWriteAction {
+                            document.setText(updatedContent.joinToString("\n"))
+                        }
+                    },
                     "Index Cucumber Scenarios",
-                    123,
+                    "com.github.rmatafonov",
                     document
             )
 
