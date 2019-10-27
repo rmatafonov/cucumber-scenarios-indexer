@@ -70,12 +70,15 @@
                     id="IndexCucumberScenarios.Files" text="Index Cucumber Scenarios"/>
             <separator/>
         </group>
-        <action id="IndexCucumberScenarios.EditorPopup"
-                class="com.intellij.idea.plugin.rmatafonov.actions.IndexCucumberScenariosEditorPopupAction"
-                text="Index Cucumber Scenarios"
-                description="Index scenarios">
+        <group>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="control alt I" keymap="$default"/>
-        </action>
+            <action id="IndexCucumberScenarios.EditorPopup"
+                    class="com.intellij.idea.plugin.rmatafonov.actions.IndexCucumberScenariosEditorPopupAction"
+                    text="Index Cucumber Scenarios"
+                    description="Index scenarios">
+                <keyboard-shortcut first-keystroke="control alt I" keymap="$default"/>
+            </action>
+            <separator/>
+        </group>
     </actions>
 </idea-plugin>
