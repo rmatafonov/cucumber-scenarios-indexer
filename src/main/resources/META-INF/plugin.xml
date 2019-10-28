@@ -43,6 +43,12 @@
         <li>Scenario: 03 - testing requirement #345 </li>
         <li>Scenario Outline: 04 - testing requirement #123 </li>
     </ul>
+    <br/>
+    <p><b>UPD 27-Oct-2019</b></p>
+    <ul>
+        <li>Added Editor Pop-up menu action</li>
+        <li>Possible update your Feature file with the shortcut Ctrl+Alt+I</li>
+    </ul>
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -57,10 +63,21 @@
     </extensions>
 
     <actions>
-        <group id="IndexCucumberScenarios.Id" text="Index Cucumber Scenarios" description=":)">
+        <group id="IndexCucumberScenarios.ProjectTree" text="Index Cucumber Scenarios" description=":)">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <separator/>
-            <action class="IndexCucumberScenariosAction" id="IndexCucumberScenarios.Files" text="Index Cucumber Scenarios"/>
+            <action class="com.intellij.idea.plugin.rmatafonov.actions.IndexCucumberScenariosProjectTreeAction"
+                    id="IndexCucumberScenarios.Files" text="Index Cucumber Scenarios"/>
+            <separator/>
+        </group>
+        <group>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <action id="IndexCucumberScenarios.EditorPopup"
+                    class="com.intellij.idea.plugin.rmatafonov.actions.IndexCucumberScenariosEditorPopupAction"
+                    text="Index Cucumber Scenarios"
+                    description="Index scenarios">
+                <keyboard-shortcut first-keystroke="control alt I" keymap="$default"/>
+            </action>
             <separator/>
         </group>
     </actions>
